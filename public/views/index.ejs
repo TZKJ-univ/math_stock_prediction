@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Stock Predictions</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    /* 追加したスタイル */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 28px;
+      color: #333;
+    }
+
+    .table-head {
+      display: flex;
+      background-color: #42cea9;
+      border-radius: 4px 4px 0 0;
+      font-size: 18px;
+      padding: 10px 0;
+      color: #ffffff;
+    }
+
+    .table-head li {
+      flex: 1;
+      text-align: center;
+    }
+
+    .table-body {
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+      overflow: hidden;
+    }
+
+    .table-body li {
+      display: flex;
+      padding: 10px 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .table-body li:last-child {
+      border-bottom: none;
+    }
+
+    .table-body li span {
+      flex: 1;
+      text-align: center;
+    }
+
+    .ticker-column {
+      color: #333;
+    }
+
+    .predicted-price-column {
+      color: #42cea9;
+    }
+
+    .price-difference-column {
+      color: #ff6347;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Stock Predictions</h2>
+    <ul class="table-head">
+      <li>Ticker</li>
+      <li>Predicted Price</li>
+      <li>Price Difference</li>
+    </ul>
+    <ul class="table-body">
+      <% predictions.forEach(prediction => { %>
+        <li>
+          <span class="ticker-column"><%= prediction.ticker %></span>
+          <span class="predicted-price-column">$<%= prediction.predicted_price.toFixed(2) %></span>
+          <span class="price-difference-column">$<%= prediction.price_difference.toFixed(2) %></span>
+        </li>
+      <% }) %>
+    </ul>
+  </div>
+</body>
+</html>
