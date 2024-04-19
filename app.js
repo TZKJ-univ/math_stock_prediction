@@ -25,7 +25,7 @@ app.set('views', path.join(__dirname, 'public', 'views'));
 
 // ルートでのクエリ処理
 app.get('/', (req, res) => {
-    mydb.query('SELECT * FROM predictions', (err, rows) => {
+    mydb.query('SELECT * FROM predictions ORDER BY id DESC', (err, rows) => {
         if (err) {
             console.error(err);
             return res.status(500).send("Error retrieving data from database.");

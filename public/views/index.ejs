@@ -19,6 +19,17 @@
       color: #333;
     }
 
+    .form-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"], button {
+      font-size: 20px;
+      padding: 10px;
+      margin: 5px;
+    }
+
     .table-head, .table-body {
       display: flex;
       flex-direction: column;
@@ -51,6 +62,10 @@
 <body>
   <div class="container">
     <h2>1年後株価予測</h2>
+    <div class="form-container">
+      <input type="text" id="input" placeholder="銘柄コードを入力">
+      <button onclick="fetchPrediction()">予測</button>
+    </div>
     <div class="table-head">
       <div>
         <span class="cell">銘柄コード</span>
@@ -59,7 +74,7 @@
         <span class="cell">線形予測価格</span>
         <span class="cell">3次回帰予測価格</span>
         <span class="cell">SVR予測価格</span>
-        <span class="cell">勾配ブースティング予測価格</span>  <!-- 追加した列 -->
+        <span class="cell">勾配ブースティング予測価格</span>
       </div>
     </div>
     <div class="table-body" id="predictions-list">
@@ -71,14 +86,11 @@
           <span class="cell">¥<%= prediction.linear_predicted_price ? prediction.linear_predicted_price.toFixed(2) : 'N/A' %></span>
           <span class="cell">¥<%= prediction.cubic_predicted_price ? prediction.cubic_predicted_price.toFixed(2) : 'N/A' %></span>
           <span class="cell">¥<%= prediction.svr_predicted_price ? prediction.svr_predicted_price.toFixed(2) : 'N/A' %></span>
-          <span class="cell">¥<%= prediction.gradient_boosting_predicted_price ? prediction.gradient_boosting_predicted_price.toFixed(2) : 'N/A' %></span> <!-- 追加した予測結果の表示 -->
+          <span class="cell">¥<%= prediction.gradient_boosting_predicted_price ? prediction.gradient_boosting_predicted_price.toFixed(2) : 'N/A' %></span>
         </div>
       <% }) %>
     </div>
   </div>
-
-  <input type="text" id="input" placeholder="銘柄コードを入力">
-  <button onclick="fetchPrediction()">予測する</button>
 
   <script>
     function fetchPrediction() {
@@ -103,7 +115,7 @@
         type: 'GET',
         success: function(response) {
             var newList = $(response).find('.table-body').html();
-            $('#predictions-list').html(newList);
+            $('#predictions-list').html(newList); // 新しいデータでリストを更新
         },
         error: function(error) {
           console.error('Error reloading predictions: ', error);
