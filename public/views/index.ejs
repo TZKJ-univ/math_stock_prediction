@@ -50,15 +50,16 @@
 </head>
 <body>
   <div class="container">
-    <h2>株価予測</h2>
+    <h2>1年後株価予測</h2>
     <div class="table-head">
       <div>
         <span class="cell">銘柄コード</span>
         <span class="cell">会社名</span>
         <span class="cell">最新価格</span>
         <span class="cell">線形予測価格</span>
-        <span class="cell">2次回帰予測価格</span>
         <span class="cell">3次回帰予測価格</span>
+        <span class="cell">SVR予測価格</span>
+        <span class="cell">勾配ブースティング予測価格</span>  <!-- 追加した列 -->
       </div>
     </div>
     <div class="table-body" id="predictions-list">
@@ -68,8 +69,9 @@
           <span class="cell"><%= prediction.company_name %></span>
           <span class="cell">¥<%= prediction.latest_price ? prediction.latest_price.toFixed(2) : 'N/A' %></span>
           <span class="cell">¥<%= prediction.linear_predicted_price ? prediction.linear_predicted_price.toFixed(2) : 'N/A' %></span>
-          <span class="cell">¥<%= prediction.quad_predicted_price ? prediction.quad_predicted_price.toFixed(2) : 'N/A' %></span>
           <span class="cell">¥<%= prediction.cubic_predicted_price ? prediction.cubic_predicted_price.toFixed(2) : 'N/A' %></span>
+          <span class="cell">¥<%= prediction.svr_predicted_price ? prediction.svr_predicted_price.toFixed(2) : 'N/A' %></span>
+          <span class="cell">¥<%= prediction.gradient_boosting_predicted_price ? prediction.gradient_boosting_predicted_price.toFixed(2) : 'N/A' %></span> <!-- 追加した予測結果の表示 -->
         </div>
       <% }) %>
     </div>
@@ -80,14 +82,14 @@
 
   <script>
     function fetchPrediction() {
-      var input = $('#input').val(); // Get the user input
+      var input = $('#input').val();
       $.ajax({
         url: '/run-python?input=' + input,
         type: 'GET',
         success: function(response) {
           console.log('Prediction updated');
-          $('#input').val(''); // Clear the input field
-          updatePredictions(); // Refresh the data from the database
+          $('#input').val('');
+          updatePredictions();
         },
         error: function(error) {
           console.error('Error fetching prediction: ', error);

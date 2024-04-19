@@ -1,12 +1,14 @@
-import mysql.connector
-import pandas as pd
 import numpy as np
+import pandas as pd
+import sys
 import datetime
 import yfinance as yf
-import sys
+import mysql.connector
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
+from sklearn.svm import SVR
+from sklearn.ensemble import GradientBoostingRegressor  # 勾配ブースティング回帰モデルのインポート
 
 # MySQLに接続
 mydb = mysql.connector.connect(
@@ -34,34 +36,41 @@ data = yf.download(ticker, start=start_date, end=end_date, interval='1mo')
 df = data.drop("Volume", axis=1)
 
 # 月次データに変換
-df_monthly = df.resample('M').last()
+df_monthly = df.resample('MS').last()
 
 # 時間インデックスを準備
-X = np.arange(len(df_monthly)).reshape(-1, 1)  # 時間を独立変数として整形
-y = df_monthly['Close'].values  # 終値を従属変数として使用
+X = np.arange(len(df_monthly)).reshape(-1, 1)
+y = df_monthly['Close'].values
 
-# 線形、2次、3次回帰モデルをフィッティング
+# 線形回帰モデルをフィッティング
 linear_model = LinearRegression()
 linear_model.fit(X, y)
 linear_prediction = linear_model.predict([[len(df_monthly) + 12]])[0]
 
-quad_model = make_pipeline(PolynomialFeatures(2), LinearRegression())
-quad_model.fit(X, y)
-quad_prediction = quad_model.predict([[len(df_monthly) + 12]])[0]
-
+# 3次多項式回帰モデルをフィッティング
 cubic_model = make_pipeline(PolynomialFeatures(3), LinearRegression())
 cubic_model.fit(X, y)
 cubic_prediction = cubic_model.predict([[len(df_monthly) + 12]])[0]
+
+# SVRモデルの訓練
+svr_model = SVR(kernel='rbf', C=1e3, gamma=0.1)
+svr_model.fit(X, y)
+svr_prediction = svr_model.predict([[len(df_monthly) + 12]])[0]
+
+# 勾配ブースティングモデルの訓練
+gb_model = GradientBoostingRegressor(n_estimators=100)
+gb_model.fit(X, y)
+gb_prediction = gb_model.predict([[len(df_monthly) + 12]])[0]
 
 # 最新価格を取得
 latest_price = df_monthly['Close'].iloc[-1]
 
 # MySQLにデータを書き込む
 sql = """
-INSERT INTO predictions (ticker, company_name, latest_price, linear_predicted_price, quad_predicted_price, cubic_predicted_price) 
-VALUES (%s, %s, %s, %s, %s, %s)
+INSERT INTO predictions (ticker, company_name, latest_price, linear_predicted_price, cubic_predicted_price, svr_predicted_price, gradient_boosting_predicted_price) 
+VALUES (%s, %s, %s, %s, %s, %s, %s)
 """
-val = (ticker, company_name, float(latest_price), float(linear_prediction), float(quad_prediction), float(cubic_prediction))
+val = (ticker, company_name, float(latest_price), float(linear_prediction), float(cubic_prediction), float(svr_prediction), float(gb_prediction))
 mycursor.execute(sql, val)
 mydb.commit()
 
