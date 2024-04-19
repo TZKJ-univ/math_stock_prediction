@@ -2,12 +2,12 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Stock Predictions</title>
+  <title>株価予測</title>
   <link rel="stylesheet" href="/css/style.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <style>
     .container {
-      max-width: 800px;
+      max-width: 1000px;
       margin: 0 auto;
       padding: 20px;
     }
@@ -50,62 +50,65 @@
 </head>
 <body>
   <div class="container">
-    <h2>Stock Predictions</h2>
+    <h2>株価予測</h2>
     <div class="table-head">
       <div>
-        <span class="cell">Ticker</span>
-        <span class="cell">Linear Predicted Price</span>
-        <span class="cell">Quad Predicted Price</span>
-        <span class="cell">Cubic Predicted Price</span>
+        <span class="cell">銘柄コード</span>
+        <span class="cell">会社名</span>
+        <span class="cell">最新価格</span>
+        <span class="cell">線形予測価格</span>
+        <span class="cell">2次回帰予測価格</span>
+        <span class="cell">3次回帰予測価格</span>
       </div>
     </div>
     <div class="table-body" id="predictions-list">
       <% predictions.forEach(prediction => { %>
         <div class="prediction-row">
           <span class="cell"><%= prediction.ticker %></span>
-          <span class="cell">$<%= prediction.linear_predicted_price ? prediction.linear_predicted_price.toFixed(2) : 'N/A' %></span>
-          <span class="cell">$<%= prediction.quad_predicted_price ? prediction.quad_predicted_price.toFixed(2) : 'N/A' %></span>
-          <span class="cell">$<%= prediction.cubic_predicted_price ? prediction.cubic_predicted_price.toFixed(2) : 'N/A' %></span>
+          <span class="cell"><%= prediction.company_name %></span>
+          <span class="cell">¥<%= prediction.latest_price ? prediction.latest_price.toFixed(2) : 'N/A' %></span>
+          <span class="cell">¥<%= prediction.linear_predicted_price ? prediction.linear_predicted_price.toFixed(2) : 'N/A' %></span>
+          <span class="cell">¥<%= prediction.quad_predicted_price ? prediction.quad_predicted_price.toFixed(2) : 'N/A' %></span>
+          <span class="cell">¥<%= prediction.cubic_predicted_price ? prediction.cubic_predicted_price.toFixed(2) : 'N/A' %></span>
         </div>
       <% }) %>
     </div>
   </div>
-  
 
-    <input type="text" id="input" placeholder="Enter ticker symbol">
-    <button onclick="fetchPrediction()">Predict</button>
+  <input type="text" id="input" placeholder="銘柄コードを入力">
+  <button onclick="fetchPrediction()">予測する</button>
 
-    <script>
-      function fetchPrediction() {
-        var input = $('#input').val(); // Get the user input
-        $.ajax({
-          url: '/run-python?input=' + input,
-          type: 'GET',
-          success: function(response) {
-            console.log('Prediction updated');
-            $('#input').val(''); // Clear the input field
-            updatePredictions(); // Refresh the data from the database
-          },
-          error: function(error) {
-            console.error('Error fetching prediction: ', error);
-          }
-        });
-      }
+  <script>
+    function fetchPrediction() {
+      var input = $('#input').val(); // Get the user input
+      $.ajax({
+        url: '/run-python?input=' + input,
+        type: 'GET',
+        success: function(response) {
+          console.log('Prediction updated');
+          $('#input').val(''); // Clear the input field
+          updatePredictions(); // Refresh the data from the database
+        },
+        error: function(error) {
+          console.error('Error fetching prediction: ', error);
+        }
+      });
+    }
 
-      function updatePredictions() {
-        $.ajax({
-          url: '/',
-          type: 'GET',
-          success: function(response) {
+    function updatePredictions() {
+      $.ajax({
+        url: '/',
+        type: 'GET',
+        success: function(response) {
             var newList = $(response).find('.table-body').html();
             $('#predictions-list').html(newList);
-          },
-          error: function(error) {
-            console.error('Error reloading predictions: ', error);
-          }
-        });
-      }
-    </script>
+        },
+        error: function(error) {
+          console.error('Error reloading predictions: ', error);
+        }
+      });
+    }
+  </script>
   </div>
 </body>
 </html>

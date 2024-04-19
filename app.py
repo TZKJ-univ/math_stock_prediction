@@ -21,6 +21,11 @@ mycursor = mydb.cursor()
 
 # コマンドライン引数からティッカーシンボルを取得
 ticker = sys.argv[1]
+ticker_obj = yf.Ticker(ticker)
+
+# ティッカーから会社名を取得
+company_info = ticker_obj.info
+company_name = company_info.get('longName', 'Unknown')  # longNameがない場合は'Unknown'を使用
 
 # データを収集
 end_date = datetime.datetime.now()
@@ -53,10 +58,10 @@ latest_price = df_monthly['Close'].iloc[-1]
 
 # MySQLにデータを書き込む
 sql = """
-INSERT INTO predictions (ticker, latest_price, linear_predicted_price, quad_predicted_price, cubic_predicted_price) 
-VALUES (%s, %s, %s, %s, %s)
+INSERT INTO predictions (ticker, company_name, latest_price, linear_predicted_price, quad_predicted_price, cubic_predicted_price) 
+VALUES (%s, %s, %s, %s, %s, %s)
 """
-val = (ticker, float(latest_price), float(linear_prediction), float(quad_prediction), float(cubic_prediction))
+val = (ticker, company_name, float(latest_price), float(linear_prediction), float(quad_prediction), float(cubic_prediction))
 mycursor.execute(sql, val)
 mydb.commit()
 
