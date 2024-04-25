@@ -8,14 +8,19 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.pipeline import make_pipeline
 from sklearn.svm import SVR
-from sklearn.ensemble import GradientBoostingRegressor  # 勾配ブースティング回帰モデルのインポート
+from sklearn.ensemble import GradientBoostingRegressor
+
+# .env ファイルから環境変数を読み込む
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 # MySQLに接続
 mydb = mysql.connector.connect(
-    host='127.0.0.1',
-    user='root',
-    password='Tozawa311@',
-    database='stock_predictions'
+    host=os.getenv('DB_HOST'),
+    user=os.getenv('DB_USER'),
+    password=os.getenv('DB_PASSWORD'),
+    database=os.getenv('DB_NAME')
 )
 
 # カーソルを取得
@@ -27,11 +32,11 @@ ticker_obj = yf.Ticker(ticker)
 
 # ティッカーから会社名を取得
 company_info = ticker_obj.info
-company_name = company_info.get('longName', 'Unknown')  # longNameがない場合は'Unknown'を使用
+company_name = company_info.get('longName', 'Unknown')
 
 # データを収集
 end_date = datetime.datetime.now()
-start_date = end_date - datetime.timedelta(days=3650)  # 最新の10年間のデータを取得
+start_date = end_date - datetime.timedelta(days=3650)
 data = yf.download(ticker, start=start_date, end=end_date, interval='1mo')
 df = data.drop("Volume", axis=1)
 
@@ -42,25 +47,22 @@ df_monthly = df.resample('MS').last()
 X = np.arange(len(df_monthly)).reshape(-1, 1)
 y = df_monthly['Close'].values
 
-# 線形回帰モデルをフィッティング
+# 各種モデルを訓練
 linear_model = LinearRegression()
 linear_model.fit(X, y)
-linear_prediction = linear_model.predict([[len(df_monthly) + 12]])[0]
+linear_prediction = linear_model.predict([[len(df_monthly) + 12]])
 
-# 3次多項式回帰モデルをフィッティング
 cubic_model = make_pipeline(PolynomialFeatures(3), LinearRegression())
 cubic_model.fit(X, y)
-cubic_prediction = cubic_model.predict([[len(df_monthly) + 12]])[0]
+cubic_prediction = cubic_model.predict([[len(df_monthly) + 12]])
 
-# SVRモデルの訓練
 svr_model = SVR(kernel='rbf', C=1e3, gamma=0.1)
 svr_model.fit(X, y)
-svr_prediction = svr_model.predict([[len(df_monthly) + 12]])[0]
+svr_prediction = svr_model.predict([[len(df_monthly) + 12]])
 
-# 勾配ブースティングモデルの訓練
 gb_model = GradientBoostingRegressor(n_estimators=100)
 gb_model.fit(X, y)
-gb_prediction = gb_model.predict([[len(df_monthly) + 12]])[0]
+gb_prediction = gb_model.predict([[len(df_monthly) + 12]])
 
 # 最新価格を取得
 latest_price = df_monthly['Close'].iloc[-1]
