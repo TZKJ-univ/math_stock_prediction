@@ -2,3 +2,6 @@
 node_modules/
 mysql/
 __pycache__/
+package.json
+package-lock.json
+node_modules/.package-lock.json
