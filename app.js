@@ -2,18 +2,19 @@ const express = require('express');
 const mysql = require('mysql');
 const path = require('path');
 const { spawn } = require('child_process');
+require('dotenv').config();
 
 const app = express();
 
-// MySQL接続設定
+// MySQLデータベース接続設定
 const mydb = mysql.createConnection({
-    host: '127.0.0.1',
-    user: 'root',
-    password: 'Tozawa311@',
-    database: 'stock_predictions'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
 });
 
-// MySQL接続
+// MySQLデータベースへの接続
 mydb.connect((err) => {
     if (err) throw err;
     console.log('Connected to MySQL');
@@ -23,20 +24,22 @@ mydb.connect((err) => {
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'public', 'views'));
 
-// ルートでのクエリ処理
+// スタティックファイルのルートを設定
+app.use(express.static(path.join(__dirname, 'public')));
+
+// ルートディレクトリでのデータベースクエリ処理
 app.get('/', (req, res) => {
     mydb.query('SELECT * FROM predictions ORDER BY id DESC', (err, rows) => {
         if (err) {
             console.error(err);
             return res.status(500).send("Error retrieving data from database.");
         }
-        console.log("Rendering index with rows:", rows); // これにより送られるデータを確認
+        console.log("Rendering index with rows:", rows);
         res.render('index', { predictions: rows });
     });
 });
 
-
-// Pythonスクリプトを実行する新しいルート
+// Pythonスクリプトを実行するルート
 app.get('/run-python', (req, res) => {
     const input = req.query.input;  // URLクエリパラメータから入力を受け取る
     const pythonProcess = spawn('python3', ['./app.py', input]);
@@ -51,11 +54,11 @@ app.get('/run-python', (req, res) => {
     });
 
     pythonProcess.on('close', (code) => {
-        console.log(`child process exited with code ${code}`);
+        console.log(`Child process exited with code ${code}`);
         if (code !== 0) {
             return res.status(500).send("Python script failed to execute.");
         }
-        res.send(dataToSend); // ここで一度だけレスポンスを送信
+        res.send(dataToSend); // Pythonスクリプトの出力を送信
     });
 });
 
