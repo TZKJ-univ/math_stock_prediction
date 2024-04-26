@@ -35,7 +35,7 @@ company_info = ticker_obj.info
 company_name = company_info.get('longName', 'Unknown')
 
 # 会社名から特定の文字列を除去
-company_name = company_name.replace(" Inc.", "").replace(" Corporation", "").replace(" Co.,Ltd.", "").replace(" Holdings", "").replace("'s", "")
+company_name = company_name.replace(" Inc.", "").replace(" Corporation", "").replace(" Co.,Ltd.", "").replace(" Holdings", "").replace("'s", "").replace(" Co., Ltd.", "")
 
 # データを収集
 end_date = datetime.datetime.now()
