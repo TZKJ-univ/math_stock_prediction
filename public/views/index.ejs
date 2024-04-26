@@ -57,8 +57,9 @@
       flex: 1;
       text-align: center;
     }
+
     .table-body {
-      margin-top: 20px; /* 表のボディ部分の上部に余白を追加 */
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -75,9 +76,10 @@
         <span class="cell">会社名</span>
         <span class="cell">最新価格</span>
         <span class="cell">線形予測価格</span>
-        <span class="cell">3次回帰予測価格</span>
+        <span class="cell">3次予測価格</span>
         <span class="cell">SVR予測価格</span>
         <span class="cell">GB予測価格</span>
+        <span class="cell"></span> <!-- Added Details Column Header -->
       </div>
     </div>
     <div class="table-body" id="predictions-list">
@@ -90,6 +92,7 @@
           <span class="cell">¥<%= prediction.cubic_predicted_price ? prediction.cubic_predicted_price.toFixed(2) : 'N/A' %></span>
           <span class="cell">¥<%= prediction.svr_predicted_price ? prediction.svr_predicted_price.toFixed(2) : 'N/A' %></span>
           <span class="cell">¥<%= prediction.gradient_boosting_predicted_price ? prediction.gradient_boosting_predicted_price.toFixed(2) : 'N/A' %></span>
+          <span class="cell"><a href="/details/<%= prediction.id %>">詳細</a></span> <!-- Added Details Link -->
         </div>
       <% }) %>
     </div>
@@ -126,6 +129,5 @@
       });
     }
   </script>
-  </div>
 </body>
 </html>

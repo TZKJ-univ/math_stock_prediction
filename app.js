@@ -34,14 +34,25 @@ app.get('/', (req, res) => {
             console.error(err);
             return res.status(500).send("Error retrieving data from database.");
         }
-        console.log("Rendering index with rows:", rows);
         res.render('index', { predictions: rows });
+    });
+});
+
+// 詳細ページのルート
+app.get('/details/:id', (req, res) => {
+    const predictionId = req.params.id;
+    mydb.query('SELECT * FROM predictions WHERE id = ?', [predictionId], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send("Error retrieving prediction details.");
+        }
+        res.render('details', { prediction: result[0] });
     });
 });
 
 // Pythonスクリプトを実行するルート
 app.get('/run-python', (req, res) => {
-    const input = req.query.input;  // URLクエリパラメータから入力を受け取る
+    const input = req.query.input;
     const pythonProcess = spawn('python3', ['./app.py', input]);
 
     let dataToSend = '';
@@ -58,7 +69,7 @@ app.get('/run-python', (req, res) => {
         if (code !== 0) {
             return res.status(500).send("Python script failed to execute.");
         }
-        res.send(dataToSend); // Pythonスクリプトの出力を送信
+        res.send(dataToSend);
     });
 });
 

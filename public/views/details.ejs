@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Prediction Details</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- 会社名に色を適用 -->
+    <h1>Stock Prediction Details for <span style="color: red;"><%= prediction.company_name %></span> on <%= new Date(prediction.created_at).toLocaleDateString("en-US") %></h1>
+    <canvas id="predictionChart"></canvas>
+    <script>
+        var ctx = document.getElementById('predictionChart').getContext('2d');
+        var predictionChart = new Chart(ctx, {
+            type: 'bar', // 線グラフから棒グラフに変更することもできます
+            data: {
+                labels: ['最新価格', '線形予測価格', '3次回帰予測価格', 'SVR予測価格', 'GB予測価格'],
+                datasets: [{
+                    label: '予測価格',
+                    data: [
+                        <%= prediction.latest_price %>, 
+                        <%= prediction.linear_predicted_price %>,
+                        <%= prediction.cubic_predicted_price %>,
+                        <%= prediction.svr_predicted_price %>,
+                        <%= prediction.gradient_boosting_predicted_price %>
+                    ],
+                    backgroundColor: [
+                        'rgba(0, 0, 0, 0.8)',
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)',
+                        'rgba(255, 159, 64, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(0, 0, 0, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
