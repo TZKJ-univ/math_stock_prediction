@@ -61,24 +61,29 @@
     .table-body {
       margin-top: 20px;
     }
+    .details-link {
+      color: blue;
+      text-decoration: underline;
+  }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>1年後株価予測</h2>
+    <h1>＊将来における当該銘柄の株価動向を示唆・保証するものではありません。</h1>
     <div class="form-container">
       <input type="text" id="input" placeholder="銘柄コードを入力">
       <button onclick="fetchPrediction()">予測</button>
     </div>
     <div class="table-head">
       <div>
-        <span class="cell">銘柄コード</span>
-        <span class="cell">会社名</span>
-        <span class="cell">最新価格</span>
-        <span class="cell">線形予測価格</span>
-        <span class="cell">3次予測価格</span>
-        <span class="cell">SVR予測価格</span>
-        <span class="cell">GB予測価格</span>
+        <span class="cell"><nobr>銘柄コード</nobr></span>
+        <span class="cell"><nobr>会社名</nobr></span>
+        <span class="cell"><nobr>最新価格</nobr></span>
+        <span class="cell"><nobr>線形予測価格</nobr></span>
+        <span class="cell"><nobr>3次予測価格</nobr></span>
+        <span class="cell"><nobr>SVR予測価格</nobr></span>
+        <span class="cell"><nobr>GB予測価格</nobr></span>
         <span class="cell"></span> <!-- Added Details Column Header -->
       </div>
     </div>
@@ -92,7 +97,9 @@
           <span class="cell">¥<%= prediction.cubic_predicted_price ? prediction.cubic_predicted_price.toFixed(2) : 'N/A' %></span>
           <span class="cell">¥<%= prediction.svr_predicted_price ? prediction.svr_predicted_price.toFixed(2) : 'N/A' %></span>
           <span class="cell">¥<%= prediction.gradient_boosting_predicted_price ? prediction.gradient_boosting_predicted_price.toFixed(2) : 'N/A' %></span>
-          <span class="cell"><a href="/details/<%= prediction.id %>">詳細</a></span> <!-- Added Details Link -->
+          <span class="cell">
+            <a href="/details/<%= prediction.id %>" class="details-link">詳細</a>
+        </span>
         </div>
       <% }) %>
     </div>
