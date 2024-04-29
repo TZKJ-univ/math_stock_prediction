@@ -7,7 +7,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <style>
     .container {
-      max-width: 1400px;
+      max-width: 2000px;
       margin: 0 auto;
       padding: 5px;
     }
@@ -70,7 +70,7 @@
 <body>
   <div class="container">
     <h2>1年後株価予測</h2>
-    <h1>＊将来における当該銘柄の株価動向を示唆・保証するものではありません。</h1>
+    <h4>＊将来における当該銘柄の株価動向を示唆・保証するものではありません。</h4>
     <div class="form-container">
       <input type="text" id="input" placeholder="銘柄コードを入力">
       <button onclick="fetchPrediction()">予測</button>
@@ -81,7 +81,7 @@
         <span class="cell"><nobr>会社名</nobr></span>
         <span class="cell"><nobr>最新価格</nobr></span>
         <span class="cell"><nobr>線形予測価格</nobr></span>
-        <span class="cell"><nobr>3次予測価格</nobr></span>
+        <span class="cell"><nobr>ARIMA予測価格</nobr></span>
         <span class="cell"><nobr>SVR予測価格</nobr></span>
         <span class="cell"><nobr>GB予測価格</nobr></span>
         <span class="cell"></span> <!-- Added Details Column Header -->

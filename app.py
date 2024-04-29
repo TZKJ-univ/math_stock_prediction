@@ -5,10 +5,9 @@ import datetime
 import yfinance as yf
 import mysql.connector
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.pipeline import make_pipeline
 from sklearn.svm import SVR
 from sklearn.ensemble import GradientBoostingRegressor
+from statsmodels.tsa.arima.model import ARIMA
 
 # .env ファイルから環境変数を読み込む
 from dotenv import load_dotenv
@@ -33,8 +32,6 @@ ticker_obj = yf.Ticker(ticker)
 # ティッカーから会社名を取得
 company_info = ticker_obj.info
 company_name = company_info.get('longName', 'Unknown')
-
-# 会社名から特定の文字列を除去
 company_name = company_name.replace(" Inc.", "").replace(" Corporation", "").replace(" Co.,Ltd.", "").replace(" Holdings", "").replace("'s", "").replace(" Co., Ltd.", "")
 
 # データを収集
@@ -55,10 +52,6 @@ linear_model = LinearRegression()
 linear_model.fit(X, y)
 linear_prediction = linear_model.predict([[len(df_monthly) + 12]])
 
-cubic_model = make_pipeline(PolynomialFeatures(3), LinearRegression())
-cubic_model.fit(X, y)
-cubic_prediction = cubic_model.predict([[len(df_monthly) + 12]])
-
 svr_model = SVR(kernel='rbf', C=1e3, gamma=0.1)
 svr_model.fit(X, y)
 svr_prediction = svr_model.predict([[len(df_monthly) + 12]])
@@ -67,15 +60,20 @@ gb_model = GradientBoostingRegressor(n_estimators=100)
 gb_model.fit(X, y)
 gb_prediction = gb_model.predict([[len(df_monthly) + 12]])
 
+# ARIMAモデルの設定と予測
+arima_model = ARIMA(y, order=(1,1,1))
+arima_fitted = arima_model.fit()
+arima_prediction = arima_fitted.forecast(steps=12)[0]
+
 # 最新価格を取得
 latest_price = df_monthly['Close'].iloc[-1]
 
 # MySQLにデータを書き込む
 sql = """
-INSERT INTO predictions (ticker, company_name, latest_price, linear_predicted_price, cubic_predicted_price, svr_predicted_price, gradient_boosting_predicted_price) 
+INSERT INTO predictions (ticker, company_name, latest_price, linear_predicted_price, svr_predicted_price, gradient_boosting_predicted_price, cubic_predicted_price) 
 VALUES (%s, %s, %s, %s, %s, %s, %s)
 """
-val = (ticker, company_name, float(latest_price), float(linear_prediction), float(cubic_prediction), float(svr_prediction), float(gb_prediction))
+val = (ticker, company_name, float(latest_price), float(linear_prediction), float(svr_prediction), float(gb_prediction), float(arima_prediction))
 mycursor.execute(sql, val)
 mydb.commit()
 
