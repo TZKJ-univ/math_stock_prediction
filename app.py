@@ -68,6 +68,12 @@ arima_prediction = arima_fitted.forecast(steps=12)[0]
 # 最新価格を取得
 latest_price = df_monthly['Close'].iloc[-1]
 
+# 同じティッカーのデータを削除する
+delete_sql = "DELETE FROM predictions WHERE ticker = %s"
+delete_val = (ticker,)
+mycursor.execute(delete_sql, delete_val)
+mydb.commit()
+
 # MySQLにデータを書き込む
 sql = """
 INSERT INTO predictions (ticker, company_name, latest_price, linear_predicted_price, svr_predicted_price, gradient_boosting_predicted_price, cubic_predicted_price) 
